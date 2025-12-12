@@ -54,13 +54,13 @@ const PaymentModal = ({ open, onOpenChange }: PaymentModalProps) => {
               <div className="flex justify-between border-b border-muted pb-2">
                 <span className="text-muted-foreground">Titular:</span>
                 <span className="text-foreground font-semibold">
-                  Luadeira Digital Angola
+                  Dado Dja Focos
                 </span>
               </div>
               <div className="flex justify-between border-b border-muted pb-2">
                 <span className="text-muted-foreground">NIB/IBAN:</span>
                 <span className="text-foreground font-semibold font-mono text-xs">
-                  AO06 0040 0000 1234 5678 9012 3
+                  AO06 0005 0000 0719 4507 1011 5
                 </span>
               </div>
               <div className="flex justify-between">
