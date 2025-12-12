@@ -49,7 +49,7 @@ const PaymentModal = ({ open, onOpenChange }: PaymentModalProps) => {
             <div className="space-y-3 text-sm font-body">
               <div className="flex justify-between border-b border-muted pb-2">
                 <span className="text-muted-foreground">Banco:</span>
-                <span className="text-foreground font-semibold">BAI</span>
+                <span className="text-foreground font-semibold">BCI</span>
               </div>
               <div className="flex justify-between border-b border-muted pb-2">
                 <span className="text-muted-foreground">Titular:</span>
