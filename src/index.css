@@ -2,59 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/*
+  Design tokens — Prémios Líderes Angola
+  Todas as cores em HSL. Paleta:
+    preto profundo  #0A0A0A  → --background
+    carvão          #1A1A1A  → --card / --surface
+    dourado         #C9A961  → --primary (apenas detalhes)
+    marfim          #F5F0E6  → --foreground
 */
 
 @layer base {
   :root {
-    /* Luxury Black & Gold Theme */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --background: 0 0% 4%;
+    --foreground: 40 43% 93%;
 
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 100%;
+    --surface: 0 0% 7%;
+    --card: 0 0% 10%;
+    --card-foreground: 40 43% 93%;
 
     --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 100%;
+    --popover-foreground: 40 43% 93%;
 
-    /* Gold Primary */
-    --primary: 43 74% 52%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 42 49% 58%;
+    --primary-foreground: 0 0% 4%;
 
-    /* Metallic Silver Secondary */
-    --secondary: 0 0% 75%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 40 43% 93%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    /* Texto secundário: contraste ≥ 6.5:1 sobre o carvão (WCAG AA) */
+    --muted: 0 0% 14%;
+    --muted-foreground: 38 8% 64%;
 
-    --accent: 43 74% 52%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 42 49% 58%;
+    --accent-foreground: 0 0% 4%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 40 43% 93%;
 
-    --border: 43 74% 52%;
-    --input: 0 0% 15%;
-    --ring: 43 74% 52%;
+    --border: 40 10% 18%;
+    --input: 40 10% 22%;
+    --ring: 42 49% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
 
-    /* Luxury Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(43 74% 52%), hsl(45 100% 70%));
-    --gradient-black: linear-gradient(180deg, hsl(0 0% 0%), hsl(0 0% 8%));
-    --gradient-silk: radial-gradient(circle at top right, hsl(43 74% 52% / 0.15), transparent 50%);
-    
-    /* Glow Effects */
-    --glow-gold: 0 0 40px hsl(43 74% 52% / 0.5);
-    --shadow-gold: 0 10px 50px hsl(43 74% 52% / 0.3);
-    --shadow-luxury: 0 20px 60px hsl(0 0% 0% / 0.7);
-    
-    /* Typography */
-    --font-heading: 'Cinzel', serif;
-    --font-elegant: 'Playfair Display', serif;
-    --font-body: 'Montserrat', sans-serif;
+    --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+    --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --nav-height: 4.5rem;
   }
 }
 
@@ -63,92 +59,148 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: var(--nav-height);
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-body);
+    @apply bg-background text-foreground font-sans antialiased;
     overflow-x: hidden;
+    text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    font-weight: 600;
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
-  .font-elegant {
-    font-family: var(--font-elegant);
+  p {
+    text-wrap: pretty;
   }
 
-  /* Luxury Animations */
-  @keyframes shimmer {
-    0% {
-      background-position: -1000px 0;
-    }
-    100% {
-      background-position: 1000px 0;
-    }
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+    color: hsl(var(--foreground));
   }
 
-  @keyframes glow-pulse {
-    0%, 100% {
-      box-shadow: 0 0 20px hsl(43 74% 52% / 0.3);
-    }
-    50% {
-      box-shadow: 0 0 40px hsl(43 74% 52% / 0.6);
-    }
+  :focus-visible {
+    outline: 1px solid hsl(var(--primary));
+    outline-offset: 3px;
   }
 
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
+  img {
+    @apply select-none;
+  }
+}
+
+@layer components {
+  /* Subtítulo em maiúsculas com espaçamento generoso */
+  .eyebrow {
+    @apply font-sans text-[0.625rem] font-medium uppercase tracking-[0.24em] text-primary sm:text-[0.6875rem] sm:tracking-[0.32em];
   }
 
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      hsl(43 74% 52% / 0.3),
-      transparent
-    );
-    background-size: 1000px 100%;
-    animation: shimmer 3s infinite;
+  /* Linha dourada fina como separador */
+  .gold-rule {
+    @apply h-px w-full;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.55), transparent);
   }
 
-  .animate-glow {
-    animation: glow-pulse 2s ease-in-out infinite;
+  .gold-rule-short {
+    @apply h-px w-6 shrink-0 bg-primary/70 sm:w-12;
   }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  .section {
+    @apply relative py-24 md:py-32;
   }
 
-  /* Gold Text Effect */
-  .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(43 74% 52%), hsl(45 100% 70%));
+  .section-alt {
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card)) 18%, hsl(var(--card)) 82%, hsl(var(--background)) 100%);
+  }
+
+  .container-luxe {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12;
+  }
+
+  /* Cartão de luxo: carvão, borda subtil, brilho dourado no hover */
+  .card-luxe {
+    @apply relative border border-border bg-card transition-[transform,border-color,box-shadow] duration-500;
+    transition-timing-function: var(--ease-luxury);
+  }
+
+  .card-luxe:hover {
+    @apply border-primary/40;
+    box-shadow:
+      0 24px 48px -24px hsl(0 0% 0% / 0.9),
+      0 0 0 1px hsl(var(--primary) / 0.08),
+      0 0 40px -12px hsl(var(--primary) / 0.25);
+  }
+
+  .text-gold-gradient {
+    background: linear-gradient(120deg, hsl(42 49% 50%), hsl(43 60% 72%) 45%, hsl(42 49% 56%));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
-  /* Silk Texture Background */
-  .bg-silk {
-    background: radial-gradient(circle at top right, hsl(43 74% 52% / 0.1), transparent 50%),
-                radial-gradient(circle at bottom left, hsl(43 74% 52% / 0.08), transparent 50%),
-                hsl(0 0% 0%);
+  /* Textura de grão discreta, aplicada uma única vez sobre todo o site */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Luxury Card */
-  .card-luxury {
-    background: linear-gradient(135deg, hsl(0 0% 5%), hsl(0 0% 8%));
-    border: 1px solid hsl(43 74% 52% / 0.3);
-    box-shadow: 0 10px 40px hsl(0 0% 0% / 0.8), inset 0 1px 0 hsl(43 74% 52% / 0.2);
+  /* Galeria masonry em colunas CSS */
+  .masonry {
+    column-gap: 1rem;
+    columns: 1;
+  }
+  @media (min-width: 560px) {
+    .masonry {
+      columns: 2;
+    }
+  }
+  @media (min-width: 1024px) {
+    .masonry {
+      columns: 3;
+      column-gap: 1.25rem;
+    }
+  }
+  .masonry > * {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+}
+
+@layer utilities {
+  .ease-luxury {
+    transition-timing-function: var(--ease-luxury);
   }
 
-  /* Smooth Transitions */
-  .transition-luxury {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

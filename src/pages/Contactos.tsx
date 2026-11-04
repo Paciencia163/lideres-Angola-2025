@@ -1,262 +1,202 @@
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { Phone, Mail, MapPin, MessageCircle, Clock, Sparkles, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Facebook, Instagram, Linkedin, Loader2, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
+import PageTransition from "@/components/layout/PageTransition";
+import PageHero from "@/components/sections/PageHero";
+import SectionHeading from "@/components/sections/SectionHeading";
+import VenueSection from "@/components/sections/VenueSection";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { site } from "@/config/site";
+import { faqs } from "@/data/content";
+import { sendForm } from "@/lib/forms";
+import { useSeo } from "@/hooks/use-seo";
+import { toast } from "sonner";
 
-const Contactos = () => {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+const subjects: Record<string, string> = {
+  geral: "Informação geral",
+  bilhetes: "Bilhetes",
+  candidatura: "Candidatura / Indicação de nomeado",
+  patrocinio: "Patrocínio e parcerias",
+  imprensa: "Imprensa",
+};
 
-  const contactMethods = [
-    {
-      icon: Phone,
-      title: "Telefone",
-      value: "+244 922 812 224",
-      link: "tel:+244922812224"
-    },
-    {
-      icon: MessageCircle,
-      title: "WhatsApp",
-      value: "+244 922 812 224",
-      link: "https://wa.me/244922812224"
-    },
-    {
-      icon: Mail,
-      title: "E-mail",
-      value: "angolajobssummit@gmail.com",
-      link: "mailto:angolajobssummit@gmail.com"
-    },
-    {
-      icon: MapPin,
-      title: "Local do Evento",
-      value: "Hotel Epic Sana, Luanda",
-      link: null
+const methods = [
+  { icon: Phone, label: "Telefone", value: site.contact.phone, href: site.contact.phoneHref },
+  { icon: Phone, label: "Telefone (alternativo)", value: site.contact.phone2, href: site.contact.phone2Href },
+  { icon: MessageCircle, label: "WhatsApp", value: site.contact.phone, href: site.contact.whatsapp },
+  { icon: Mail, label: "E-mail", value: site.contact.email, href: `mailto:${site.contact.email}` },
+  { icon: MapPin, label: "Local do evento", value: `${site.event.venue}, ${site.event.city}` },
+];
+
+const inputCls =
+  "mt-2 h-12 w-full border-b border-input bg-transparent text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none";
+
+const ContactForm = () => {
+  const [params] = useSearchParams();
+  const initial = params.get("assunto") ?? "geral";
+  const [busy, setBusy] = useState(false);
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    if (!data.nome?.trim() || !data.mensagem?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email ?? "")) {
+      toast.error("Preencha o nome, um e-mail válido e a mensagem.");
+      return;
     }
-  ];
-
-  const faqs = [
-    {
-      question: "Como posso nomear alguém?",
-      answer: "Entre em contacto connosco através de qualquer um dos canais acima e nossa equipe irá orientá-lo no processo de nomeação."
-    },
-    {
-      question: "Quando receberei a confirmação do meu ingresso?",
-      answer: "A confirmação é enviada em até 24 horas após a verificação do pagamento, por e-mail ou WhatsApp."
-    },
-    {
-      question: "Há estacionamento disponível no local?",
-      answer: "Sim, o Hotel Epic Sana oferece estacionamento gratuito para todos os convidados do evento."
-    },
-    {
-      question: "Qual é o dress code do evento?",
-      answer: "O dress code é formal/gala. Trajes elegantes são obrigatórios para manter o padrão de excelência do evento."
+    setBusy(true);
+    try {
+      const mode = await sendForm("contacto", { ...data, assunto: subjects[data.assunto] ?? data.assunto });
+      toast.success(mode === "enviado" ? "Mensagem enviada. Responderemos em breve." : "Abrimos o seu e-mail com a mensagem preenchida — basta enviar.");
+      if (mode === "enviado") form.reset();
+    } catch {
+      toast.error("Não foi possível enviar. Tente por WhatsApp ou telefone.");
+    } finally {
+      setBusy(false);
     }
-  ];
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <form onSubmit={onSubmit} noValidate className="grid gap-8 sm:grid-cols-2">
+      <label className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">
+        Nome
+        <input name="nome" autoComplete="name" required className={inputCls} />
+      </label>
+      <label className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">
+        E-mail
+        <input name="email" type="email" inputMode="email" autoComplete="email" required className={inputCls} />
+      </label>
+      <label className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">
+        Telefone (opcional)
+        <input name="telefone" type="tel" inputMode="tel" autoComplete="tel" className={inputCls} />
+      </label>
+      <label className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">
+        Assunto
+        <select name="assunto" defaultValue={subjects[initial] ? initial : "geral"} className={`${inputCls} appearance-none`}>
+          {Object.entries(subjects).map(([k, v]) => (
+            <option key={k} value={k} className="bg-card">
+              {v}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground sm:col-span-2">
+        Mensagem
+        <textarea name="mensagem" required rows={4} className={`${inputCls} h-auto resize-none py-3`} />
+      </label>
+      <div className="sm:col-span-2">
+        <Button type="submit" variant="gold" size="lg" disabled={busy} className="w-full sm:w-auto">
+          {busy && <Loader2 className="animate-spin" />}
+          Enviar mensagem
+        </Button>
+      </div>
+    </form>
+  );
+};
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        
-        <div className="absolute top-40 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+const Contactos = () => {
+  useSeo("Contactos", `Fale com a organização dos ${site.name}: telefone, WhatsApp, e-mail e perguntas frequentes.`);
+  return (
+    <PageTransition>
+      <PageHero
+        eyebrow="Fale connosco"
+        title={<em className="text-primary">Contactos</em>}
+        description="Estamos à disposição para esclarecer as suas dúvidas sobre a gala, bilhetes, nomeações e parcerias."
+      />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full mb-8 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Fale Connosco</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-heading font-bold mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <span className="text-gradient-gold">Contactos</span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl font-elegant text-muted-foreground max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Estamos à disposição para esclarecer suas dúvidas
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Methods */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-6">
-              {contactMethods.map((method, index) => (
-                <div
-                  key={index}
-                  className="group bg-gradient-to-br from-card to-background border border-primary/20 rounded-2xl p-6 transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_40px_hsl(43_74%_52%_/_0.15)] animate-fade-in"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl flex items-center justify-center flex-shrink-0 border border-primary/30 group-hover:scale-110 transition-transform">
-                      <method.icon className="text-primary w-6 h-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-heading font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                        {method.title}
-                      </h3>
-                      {method.link ? (
-                        <a
-                          href={method.link}
-                          className="text-muted-foreground font-body hover:text-primary transition-colors"
-                          target={method.link.startsWith('http') ? '_blank' : undefined}
-                          rel={method.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                        >
-                          {method.value}
-                        </a>
-                      ) : (
-                        <p className="text-muted-foreground font-body">{method.value}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Office Hours */}
-      <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-card via-card/80 to-card/60 border border-primary/30 rounded-3xl p-10 text-center backdrop-blur-sm">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 rounded-xl mb-6 border border-primary/30">
-                <Clock className="text-primary w-7 h-7" />
-              </div>
-              <h2 className="text-3xl font-heading font-bold text-foreground mb-6">
-                Horário de <span className="text-gradient-gold">Atendimento</span>
-              </h2>
-              <div className="space-y-3">
-                <p className="text-lg text-foreground font-body">
-                  <span className="text-primary font-semibold">Segunda a Sexta:</span> 09:00 - 18:00
-                </p>
-                <p className="text-lg text-foreground font-body">
-                  <span className="text-primary font-semibold">Sábado:</span> 09:00 - 13:00
-                </p>
-                <p className="text-muted-foreground font-body text-sm mt-4">
-                  Domingo e feriados: Fechado
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Event Location */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-card to-background border-2 border-primary/30 rounded-3xl p-8 md:p-12 animate-fade-in">
-              <h2 className="text-3xl font-heading font-bold text-foreground mb-8 text-center">
-                Local do <span className="text-gradient-gold">Evento</span>
-              </h2>
-              <div className="text-center space-y-6">
-                <div>
-                  <h3 className="text-3xl font-heading font-semibold text-gradient-gold mb-2">
-                    Hotel Epic Sana
-                  </h3>
-                  <p className="text-lg text-muted-foreground font-body">
-                    Um dos hotéis mais luxuosos de Luanda
-                  </p>
-                </div>
-                <div className="bg-primary/10 p-6 rounded-xl border border-primary/20 max-w-md mx-auto">
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    <MapPin className="text-primary w-5 h-5" />
-                    <span className="text-lg text-foreground font-body">Luanda, Angola</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground font-body">
-                    Instalações de classe mundial com capacidade para eventos de grande porte
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-card to-background border border-primary/20 rounded-3xl p-8 md:p-12 animate-fade-in">
-              <h2 className="text-3xl font-heading font-bold text-foreground mb-10 text-center">
-                Perguntas <span className="text-gradient-gold">Frequentes</span>
-              </h2>
-              <div className="space-y-4">
-                {faqs.map((faq, index) => (
-                  <div
-                    key={index}
-                    className="border border-primary/20 rounded-xl overflow-hidden hover:border-primary/40 transition-colors"
-                  >
-                    <button
-                      onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                      className="w-full flex items-center justify-between p-5 text-left"
+      <section className="section">
+        <div className="container-luxe grid gap-16 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <Stagger className="divide-y divide-primary/15 border-y border-primary/15">
+              {methods.map(({ icon: Icon, label, value, href }) => (
+                <StaggerItem key={label}>
+                  {href ? (
+                    <a
+                      href={href}
+                      target={href.startsWith("http") ? "_blank" : undefined}
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-5 py-6"
                     >
-                      <h4 className="font-heading font-semibold text-foreground pr-4">
-                        {faq.question}
-                      </h4>
-                      <ChevronDown
-                        className={`text-primary w-5 h-5 flex-shrink-0 transition-transform ${
-                          openFaq === index ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </button>
-                    {openFaq === index && (
-                      <div className="px-5 pb-5">
-                        <p className="text-muted-foreground font-body text-sm leading-relaxed">
-                          {faq.answer}
-                        </p>
-                      </div>
-                    )}
+                      <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.25} />
+                      <span className="min-w-0">
+                        <span className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">{label}</span>
+                        <span className="mt-1 block break-all text-lg text-foreground transition-colors group-hover:text-primary">{value}</span>
+                      </span>
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-5 py-6">
+                      <Icon className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.25} />
+                      <span>
+                        <span className="block text-[0.65rem] uppercase tracking-[0.22em] text-muted-foreground">{label}</span>
+                        <span className="mt-1 block text-lg text-foreground">{value}</span>
+                      </span>
+                    </div>
+                  )}
+                </StaggerItem>
+              ))}
+            </Stagger>
+
+            <Reveal className="mt-12">
+              <p className="eyebrow">Horário de atendimento</p>
+              <dl className="mt-5 space-y-3 text-sm">
+                {site.contact.hours.map((h) => (
+                  <div key={h.days} className="flex justify-between gap-4">
+                    <dt className="text-muted-foreground">{h.days}</dt>
+                    <dd className="text-foreground">{h.time}</dd>
                   </div>
                 ))}
-              </div>
-            </div>
+              </dl>
+            </Reveal>
+
+            <Reveal className="mt-12">
+              <p className="eyebrow">Redes sociais</p>
+              <ul className="mt-5 flex gap-3">
+                {[
+                  { href: site.social.instagram, label: "Instagram", icon: Instagram },
+                  { href: site.social.facebook, label: "Facebook", icon: Facebook },
+                  { href: site.social.linkedin, label: "LinkedIn", icon: Linkedin },
+                  { href: site.social.youtube, label: "YouTube", icon: Youtube },
+                ].map(({ href, label, icon: Icon }) => (
+                  <li key={label}>
+                    <a href={href} aria-label={label} className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground/70 transition-colors hover:border-primary hover:text-primary">
+                      <Icon className="h-4 w-4" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           </div>
+
+          <Reveal delay={0.1} className="border border-border bg-card p-6 sm:p-10 lg:col-span-7">
+            <h2 className="font-display text-3xl text-foreground">Envie-nos uma mensagem</h2>
+            <p className="mb-10 mt-2 text-sm text-muted-foreground">Respondemos em dias úteis, dentro do horário de atendimento.</p>
+            <ContactForm />
+          </Reveal>
         </div>
       </section>
 
-      {/* Social Media */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/20 rounded-full blur-3xl" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="bg-gradient-to-br from-card via-card/80 to-card/60 border border-primary/30 rounded-3xl p-10 md:p-16 backdrop-blur-sm">
-              <h2 className="text-3xl font-heading font-bold text-foreground mb-4">
-                Siga-nos nas <span className="text-gradient-gold">Redes Sociais</span>
-              </h2>
-              <p className="text-lg text-muted-foreground font-body mb-8">
-                Fique por dentro das últimas novidades sobre o evento
-              </p>
-              <div className="flex justify-center gap-4">
-                <a href="#" className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/30 hover:bg-primary/20 hover:border-primary/50 transition-all text-2xl">
-                  📱
-                </a>
-                <a href="#" className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/30 hover:bg-primary/20 hover:border-primary/50 transition-all text-2xl">
-                  💼
-                </a>
-                <a href="#" className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/30 hover:bg-primary/20 hover:border-primary/50 transition-all text-2xl">
-                  📸
-                </a>
-              </div>
-            </div>
-          </div>
+      <section className="section section-alt">
+        <div className="container-luxe max-w-3xl">
+          <SectionHeading eyebrow="Perguntas frequentes" title="Tudo o que precisa de saber" />
+          <Reveal>
+            <Accordion type="single" collapsible className="border-t border-primary/15">
+              {faqs.map((f, i) => (
+                <AccordionItem key={f.question} value={`faq-${i}`} className="border-b border-primary/15">
+                  <AccordionTrigger className="py-6 text-left font-display text-lg font-normal text-foreground hover:text-primary hover:no-underline [&>svg]:text-primary">
+                    {f.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-6 text-base leading-relaxed text-muted-foreground">{f.answer}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Reveal>
         </div>
       </section>
 
-      <Footer />
-    </div>
+      <VenueSection />
+    </PageTransition>
   );
 };
 

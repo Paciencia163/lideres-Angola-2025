@@ -326,12 +326,17 @@ const Nomeacoes = () => {
             <p className="text-muted-foreground font-body text-lg mb-8">
               Não perca a oportunidade de participar da maior celebração da liderança angolana.
             </p>
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-heading group">
-              <Link to="/ingressos">
-                Adquirir Ingressos
-                <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-heading group">
+                <Link to="/ingressos">
+                  Adquirir Ingressos
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="font-heading">
+                <Link to="/painel/nova-indicacao">Submeter uma Indicação</Link>
+              </Button>
+            </div>
           </div>
         </ScrollReveal>
       </section>
