@@ -1,73 +1,38 @@
-# Welcome to your Lovable project
+# Prémios Líderes Angola 2026
 
-## Project info
+Site oficial da gala Prémios Líderes Angola — React, Vite, Tailwind CSS, shadcn/ui e Framer Motion.
 
-**URL**: https://lovable.dev/projects/efc2a23f-cf1d-42ca-a1eb-6cd77b4fb4b2
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/efc2a23f-cf1d-42ca-a1eb-6cd77b4fb4b2) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Começar
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev        # http://localhost:8080
+npm run build      # versão de produção em /dist
 ```
 
-**Edit a file directly in GitHub**
+## Onde editar o conteúdo
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| O quê | Ficheiro |
+| --- | --- |
+| Data, hora, local, contactos, preço dos bilhetes, redes sociais, prazo das indicações | `src/config/site.ts` |
+| Categorias | `src/data/categories.ts` |
+| Nomeados 2026 e arquivo 2025 | `src/data/nominees.ts` |
+| Galeria, programa, vencedores, Hall da Fama, patrocinadores, testemunhos, FAQ | `src/data/content.ts` |
+| Cores, tipografia e espaçamentos (design tokens) | `src/index.css` e `tailwind.config.ts` |
+| SEO global e dados estruturados (schema.org Event) | `index.html` |
 
-**Use GitHub Codespaces**
+Todos os dados provisórios estão marcados com `⚠️` e `placeholder: true`. Procure por `⚠️` para encontrar tudo o que falta substituir.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Indicações e formulários
 
-## What technologies are used for this project?
+A página `/indicacao` recolhe indicações de personalidades e instituições por categoria.
+Sem configuração, os formulários (indicação, contacto e newsletter) abrem o e-mail do visitante já preenchido para `angolajobssummit@gmail.com`.
+Para receber os envios directamente num serviço próprio, defina num ficheiro `.env`:
 
-This project is built with:
+```sh
+VITE_FORMS_ENDPOINT=https://...  # POST { kind: "indicacao" | "contacto" | "newsletter", ... }
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Imagens de marca
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/efc2a23f-cf1d-42ca-a1eb-6cd77b4fb4b2) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+`npm run generate:assets` gera de novo `public/og-image.png` (1200×630), o favicon e os ícones a partir de `scripts/generate-brand-assets.mjs`.

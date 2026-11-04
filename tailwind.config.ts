@@ -1,24 +1,29 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1.25rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1280px",
       },
     },
     extend: {
+      screens: {
+        xs: "400px",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        surface: "hsl(var(--surface))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -47,35 +52,31 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        gold: {
-          DEFAULT: "hsl(43 74% 52%)",
-          light: "hsl(45 100% 70%)",
-          dark: "hsl(43 74% 42%)",
-        },
-        silver: {
-          DEFAULT: "hsl(0 0% 75%)",
-          light: "hsl(0 0% 85%)",
-        },
+        // Atalhos de marca (mesmos valores que os tokens)
+        ink: "#0A0A0A",
+        charcoal: "#1A1A1A",
+        gold: "#C9A961",
+        ivory: "#F5F0E6",
       },
       fontFamily: {
-        heading: ["var(--font-heading)", "serif"],
-        elegant: ["var(--font-elegant)", "serif"],
-        body: ["var(--font-body)", "sans-serif"],
+        display: ["var(--font-display)"],
+        sans: ["var(--font-sans)"],
       },
-      backgroundImage: {
-        'gradient-gold': 'var(--gradient-gold)',
-        'gradient-black': 'var(--gradient-black)',
-        'gradient-silk': 'var(--gradient-silk)',
+      fontSize: {
+        "display-xl": ["clamp(2.75rem, 8vw, 6.5rem)", { lineHeight: "0.98", letterSpacing: "-0.02em" }],
+        "display-lg": ["clamp(2.25rem, 5.5vw, 4.25rem)", { lineHeight: "1.04", letterSpacing: "-0.015em" }],
+        "display-md": ["clamp(1.75rem, 3.6vw, 2.75rem)", { lineHeight: "1.1", letterSpacing: "-0.01em" }],
       },
-      boxShadow: {
-        'glow': 'var(--glow-gold)',
-        'gold': 'var(--shadow-gold)',
-        'luxury': 'var(--shadow-luxury)',
+      spacing: {
+        nav: "var(--nav-height)",
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 1px)",
+        sm: "calc(var(--radius) - 2px)",
+      },
+      transitionTimingFunction: {
+        luxury: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
       keyframes: {
         "accordion-down": {
@@ -86,32 +87,28 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        shimmer: {
-          "0%": { backgroundPosition: "-1000px 0" },
-          "100%": { backgroundPosition: "1000px 0" },
+        "scroll-cue": {
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          "30%": { opacity: "1" },
+          "100%": { transform: "translateY(200%)", opacity: "0" },
         },
-        "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(43 74% 52% / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(43 74% 52% / 0.6)" },
+        "slow-zoom": {
+          from: { transform: "scale(1.08)" },
+          to: { transform: "scale(1)" },
         },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
-        },
-        "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 3s infinite",
-        glow: "glow-pulse 2s ease-in-out infinite",
-        float: "float 6s ease-in-out infinite",
-        "fade-in": "fade-in 0.6s ease-out",
+        "accordion-down": "accordion-down 0.25s ease-out",
+        "accordion-up": "accordion-up 0.25s ease-out",
+        "scroll-cue": "scroll-cue 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite",
+        "slow-zoom": "slow-zoom 14s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        marquee: "marquee 40s linear infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;

@@ -15,4 +15,16 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Bibliotecas em ficheiros separados: ficam em cache entre actualizações do site
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          motion: ["framer-motion"],
+          radix: ["@radix-ui/react-dialog", "@radix-ui/react-accordion"],
+        },
+      },
+    },
+  },
 }));
