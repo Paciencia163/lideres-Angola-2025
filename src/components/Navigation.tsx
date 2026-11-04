@@ -1,100 +1,110 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+
+const navLinks = [
+  { to: "/", label: "Início" },
+  { to: "/sobre", label: "Sobre" },
+  { to: "/categorias", label: "Categorias" },
+  { to: "/nomeacoes", label: "Nomeados" },
+  { to: "/#vencedores", label: "Vencedores" },
+  { to: "/#galeria", label: "Galeria" },
+  { to: "/#patrocinadores", label: "Patrocinadores" },
+  { to: "/contactos", label: "Contactos" },
+];
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  const navLinks = [
-    { to: "/", label: "Início" },
-    { to: "/sobre", label: "Sobre" },
-    { to: "/categorias", label: "Categorias" },
-    { to: "/nomeacoes", label: "Nomeações" },
-    { to: "/ingressos", label: "Ingressos" },
-    { to: "/edicao-2025", label: "Edição 2025" },
-    { to: "/contactos", label: "Contactos" },
-  ];
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const isActive = (path: string) => location.pathname === path;
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+  }, [isOpen]);
+
+  const isActive = (to: string) => location.pathname + location.hash === to || (to === "/" && location.pathname === "/" && !location.hash);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-primary/20">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="text-2xl font-heading font-bold text-gradient-gold">
-              PRÉMIOS LÍDERES ANGOLA
-            </div>
+    <>
+      <nav
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
+          scrolled ? "bg-background/85 backdrop-blur-md border-b border-border" : "bg-transparent border-b border-transparent"
+        }`}
+      >
+        <div className="container mx-auto px-5 h-20 flex items-center justify-between">
+          <Link to="/" className="flex flex-col leading-none" aria-label="Prémios Líderes Angola — Início">
+            <span className="font-heading text-xl tracking-wide text-foreground">Prémios Líderes</span>
+            <span className="eyebrow mt-1 text-[0.6rem]">Angola</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
-            {navLinks.map((link) => (
+          <div className="hidden xl:flex items-center gap-7">
+            {navLinks.map((l) => (
               <Link
-                key={link.to}
-                to={link.to}
-                className={`font-body text-sm uppercase tracking-wider transition-luxury ${
-                  isActive(link.to)
-                    ? "text-primary font-semibold"
-                    : "text-foreground hover:text-primary"
+                key={l.to}
+                to={l.to}
+                className={`text-[0.72rem] uppercase tracking-[0.2em] transition-colors ${
+                  isActive(l.to) ? "text-primary" : "text-foreground/75 hover:text-primary"
                 }`}
               >
-                {link.label}
+                {l.label}
               </Link>
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
-            <Button
-              asChild
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 animate-glow"
-            >
-              <Link to="/ingressos">Adquirir Ingresso</Link>
+          <div className="flex items-center gap-3">
+            <Button asChild className="hidden sm:inline-flex rounded-none px-6 uppercase tracking-[0.2em] text-xs">
+              <Link to="/votar">Votar</Link>
             </Button>
+            <button
+              onClick={() => setIsOpen(true)}
+              className="xl:hidden text-foreground p-2"
+              aria-label="Abrir menu"
+            >
+              <Menu size={26} />
+            </button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden text-primary"
-          >
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
         </div>
+      </nav>
 
-        {/* Mobile Menu */}
+      <AnimatePresence>
         {isOpen && (
-          <div className="lg:hidden mt-4 pb-4 space-y-4 animate-fade-in">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                onClick={() => setIsOpen(false)}
-                className={`block font-body text-sm uppercase tracking-wider py-2 transition-luxury ${
-                  isActive(link.to)
-                    ? "text-primary font-semibold"
-                    : "text-foreground hover:text-primary"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Button
-              asChild
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            >
-              <Link to="/ingressos" onClick={() => setIsOpen(false)}>
-                Adquirir Ingresso
-              </Link>
-            </Button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-background flex flex-col"
+          >
+            <div className="container mx-auto px-5 h-20 flex items-center justify-between">
+              <span className="font-heading text-xl">Prémios Líderes</span>
+              <button onClick={() => setIsOpen(false)} aria-label="Fechar menu" className="p-2 text-primary">
+                <X size={28} />
+              </button>
+            </div>
+            <div className="flex-1 flex flex-col justify-center px-8 gap-5">
+              {navLinks.map((l, i) => (
+                <motion.div key={l.to} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
+                  <Link to={l.to} onClick={() => setIsOpen(false)} className="font-heading text-3xl text-foreground hover:text-primary transition-colors">
+                    {l.label}
+                  </Link>
+                </motion.div>
+              ))}
+              <Button asChild size="lg" className="mt-6 rounded-none uppercase tracking-[0.2em] h-14">
+                <Link to="/votar" onClick={() => setIsOpen(false)}>Votar Agora</Link>
+              </Button>
+            </div>
+          </motion.div>
         )}
-      </div>
-    </nav>
+      </AnimatePresence>
+    </>
   );
 };
 
