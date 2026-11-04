@@ -1,30 +1,27 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+// Configuração final para Vite + React (produção no Vercel)
+export default defineConfig({
+  // Base correta para Vercel (SPA)
+  base: "/",
+
+  // Plugins
+  plugins: [
+    react(),
+  ],
+
+  // Resolução de caminhos (alias @/)
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
+  // Build otimizado
   build: {
-    rollupOptions: {
-      output: {
-        // Bibliotecas em ficheiros separados: ficam em cache entre actualizações do site
-        manualChunks: {
-          react: ["react", "react-dom", "react-router-dom"],
-          motion: ["framer-motion"],
-          radix: ["@radix-ui/react-dialog", "@radix-ui/react-accordion"],
-        },
-      },
-    },
+    outDir: "dist",
+    sourcemap: false,
   },
-}));
+});
